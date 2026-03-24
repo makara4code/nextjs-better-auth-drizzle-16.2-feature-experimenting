@@ -20,6 +20,47 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Postgres With Docker
+
+Copy [`.env.example`](./.env.example) to `.env`, then start Postgres:
+
+```bash
+docker compose up -d postgres
+```
+
+The database will be available at:
+
+```bash
+postgresql://postgres:postgres@localhost:5432/app
+```
+
+Useful commands:
+
+```bash
+docker compose ps
+docker compose logs -f postgres
+docker compose down
+```
+
+## Better Auth + Drizzle
+
+This project now includes:
+
+- Better Auth with email/password authentication
+- Drizzle ORM configured for PostgreSQL
+- A generated Better Auth schema in [`db/schema.ts`](./db/schema.ts)
+- Auth routes mounted at `/api/auth/[...all]`
+- A demo sign-in page at `/sign-in`
+- A protected demo dashboard at `/dashboard`
+
+Useful commands:
+
+```bash
+bun run auth:generate
+bun run db:generate
+bun run db:migrate
+```
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
