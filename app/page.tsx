@@ -23,7 +23,7 @@ export default function Home() {
           <p className="max-w-2xl text-pretty text-base leading-7 text-zinc-600 dark:text-zinc-400 sm:text-lg sm:leading-8">
             This starter now includes email and password auth backed by Better
             Auth, a Drizzle schema, and the Postgres service from Docker
-            Compose. Sign in, create an account, and land on a protected server
+            Compose. Log in, create an account, and land on a protected server
             component dashboard.
           </p>
           <p className="max-w-2xl text-sm leading-6 text-zinc-500 dark:text-zinc-500">
@@ -54,9 +54,9 @@ export default function Home() {
         <div className="flex w-full flex-col gap-4 text-base font-medium sm:w-auto sm:flex-row">
           <Link
             className="flex h-12 w-full items-center justify-center rounded-full bg-foreground px-5 text-background transition-colors hover:bg-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-4 focus-visible:ring-offset-white dark:hover:bg-zinc-200 dark:focus-visible:ring-white dark:focus-visible:ring-offset-black sm:w-auto sm:min-w-40"
-            href="/sign-in"
+            href="/login"
           >
-            Open Sign In
+            Open Login
           </Link>
           <Link
             className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/10 px-5 text-zinc-950 transition-colors hover:border-black/20 hover:bg-black/[.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-4 focus-visible:ring-offset-white dark:border-white/15 dark:text-zinc-50 dark:hover:bg-white/[0.08] dark:focus-visible:ring-white dark:focus-visible:ring-offset-black sm:w-auto sm:min-w-40"

@@ -1,5 +1,15 @@
 "use client";
 
+import {
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  Input,
+} from "@heroui/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { startTransition, useState } from "react";
@@ -21,6 +31,9 @@ export function AuthForm() {
   const [isPending, setIsPending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const nameInputId = "auth-name";
+  const emailInputId = "auth-email";
+  const passwordInputId = "auth-password";
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -60,138 +73,160 @@ export function AuthForm() {
   };
 
   return (
-    <div className="w-full max-w-md rounded-[2rem] border border-black/10 bg-white p-8 shadow-[0_24px_80px_rgba(15,23,42,0.08)] dark:border-white/10 dark:bg-zinc-950 dark:shadow-none">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <p className="text-sm font-medium uppercase tracking-[0.2em] text-zinc-500">
-            Better Auth
-          </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-black dark:text-zinc-50">
-            {mode === "sign-in" ? "Sign In" : "Create Account"}
-          </h1>
+    <Card className="w-full max-w-md border border-black/5 bg-white/95 shadow-2xl shadow-black/10 dark:border-white/10 dark:bg-zinc-950/95">
+      <CardHeader className="gap-4 border-b border-black/5 pb-6 dark:border-white/10">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-sm font-medium uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
+              Better Auth
+            </p>
+            <CardTitle className="mt-2 text-3xl text-black dark:text-zinc-50">
+              {mode === "sign-in" ? "Login" : "Create Account"}
+            </CardTitle>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onPress={() => {
+              setMode((currentMode) =>
+                currentMode === "sign-in" ? "sign-up" : "sign-in",
+              );
+              setError(null);
+              setMessage(null);
+            }}
+          >
+            {mode === "sign-in" ? "Need an account?" : "Have an account?"}
+          </Button>
         </div>
-        <button
-          type="button"
-          onClick={() => {
-            setMode((currentMode) =>
-              currentMode === "sign-in" ? "sign-up" : "sign-in",
-            );
-            setError(null);
-            setMessage(null);
-          }}
-          className="rounded-full border border-black/10 px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-black/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-4 focus-visible:ring-offset-white dark:border-white/15 dark:text-zinc-200 dark:hover:bg-white/[0.06] dark:focus-visible:ring-white dark:focus-visible:ring-offset-black"
-        >
-          {mode === "sign-in" ? "Need an account?" : "Have an account?"}
-        </button>
-      </div>
+        <CardDescription className="max-w-lg text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+          Use your email and password to access the dashboard. This auth surface
+          now runs fully on HeroUI components.
+        </CardDescription>
+      </CardHeader>
 
-      <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
-        {mode === "sign-up" ? (
-          <label className="block">
-            <span className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-200">
-              Name
+      <CardContent className="space-y-6">
+        <form className="space-y-5" onSubmit={handleSubmit}>
+          {mode === "sign-up" ? (
+            <label className="block" htmlFor={nameInputId}>
+              <span className="mb-2 block text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                Name
+              </span>
+              <Input
+                id={nameInputId}
+                required
+                type="text"
+                name="name"
+                autoComplete="name"
+                value={values.name}
+                onChange={(event) =>
+                  setValues((currentValues) => ({
+                    ...currentValues,
+                    name: event.target.value,
+                  }))
+                }
+                variant="primary"
+                fullWidth
+                className="rounded-2xl"
+                placeholder="Jane Doe..."
+              />
+            </label>
+          ) : null}
+
+          <label className="block" htmlFor={emailInputId}>
+            <span className="mb-2 block text-sm font-medium text-zinc-900 dark:text-zinc-100">
+              Email
             </span>
-            <input
+            <Input
+              id={emailInputId}
               required
-              type="text"
-              name="name"
-              autoComplete="name"
-              value={values.name}
+              type="email"
+              name="email"
+              autoComplete="email"
+              spellCheck={false}
+              value={values.email}
               onChange={(event) =>
                 setValues((currentValues) => ({
                   ...currentValues,
-                  name: event.target.value,
+                  email: event.target.value,
                 }))
               }
-              className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-black outline-none transition focus-visible:ring-2 focus-visible:ring-black dark:border-white/10 dark:bg-zinc-900 dark:text-zinc-50 dark:focus-visible:ring-white"
-              placeholder="Jane Doe…"
+              variant="secondary"
+              fullWidth
+              className="rounded-2xl"
+              placeholder="jane@example.com..."
             />
           </label>
-        ) : null}
 
-        <label className="block">
-          <span className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-200">
-            Email
-          </span>
-          <input
-            required
-            type="email"
-            name="email"
-            autoComplete="email"
-            spellCheck={false}
-            value={values.email}
-            onChange={(event) =>
-              setValues((currentValues) => ({
-                ...currentValues,
-                email: event.target.value,
-              }))
-            }
-            className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-black outline-none transition focus-visible:ring-2 focus-visible:ring-black dark:border-white/10 dark:bg-zinc-900 dark:text-zinc-50 dark:focus-visible:ring-white"
-            placeholder="jane@example.com…"
-          />
-        </label>
+          <label className="block" htmlFor={passwordInputId}>
+            <span className="mb-2 block text-sm font-medium text-zinc-900 dark:text-zinc-100">
+              Password
+            </span>
+            <Input
+              id={passwordInputId}
+              required
+              type="password"
+              name="password"
+              autoComplete={
+                mode === "sign-in" ? "current-password" : "new-password"
+              }
+              value={values.password}
+              onChange={(event) =>
+                setValues((currentValues) => ({
+                  ...currentValues,
+                  password: event.target.value,
+                }))
+              }
+              variant="secondary"
+              fullWidth
+              className="rounded-2xl"
+              placeholder="At least 8 characters..."
+            />
+          </label>
 
-        <label className="block">
-          <span className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-200">
-            Password
-          </span>
-          <input
-            required
-            type="password"
-            name="password"
-            autoComplete={
-              mode === "sign-in" ? "current-password" : "new-password"
-            }
-            value={values.password}
-            onChange={(event) =>
-              setValues((currentValues) => ({
-                ...currentValues,
-                password: event.target.value,
-              }))
-            }
-            className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-black outline-none transition focus-visible:ring-2 focus-visible:ring-black dark:border-white/10 dark:bg-zinc-900 dark:text-zinc-50 dark:focus-visible:ring-white"
-            placeholder="At least 8 characters…"
-          />
-        </label>
+          {error ? (
+            <p aria-live="polite" className="text-sm text-red-600">
+              {error}
+            </p>
+          ) : null}
 
-        {error ? (
-          <p aria-live="polite" className="text-sm text-red-600">
-            {error}
-          </p>
-        ) : null}
+          {message ? (
+            <p aria-live="polite" className="text-sm text-emerald-600">
+              {message}
+            </p>
+          ) : null}
 
-        {message ? (
-          <p aria-live="polite" className="text-sm text-emerald-600">
-            {message}
-          </p>
-        ) : null}
+          <Button
+            type="submit"
+            variant="primary"
+            size="md"
+            fullWidth
+            isDisabled={isPending}
+          >
+            {isPending
+              ? mode === "sign-in"
+                ? "Signing In..."
+                : "Creating Account..."
+              : mode === "sign-in"
+                ? "Login"
+                : "Create Account"}
+          </Button>
+        </form>
+      </CardContent>
 
-        <button
-          type="submit"
-          disabled={isPending}
-          className="w-full rounded-full bg-foreground px-5 py-3 text-sm font-semibold text-background transition-colors hover:bg-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-4 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-60 dark:hover:bg-zinc-200 dark:focus-visible:ring-white dark:focus-visible:ring-offset-black"
-        >
-          {isPending
-            ? mode === "sign-in"
-              ? "Signing In…"
-              : "Creating Account…"
-            : mode === "sign-in"
-              ? "Sign In"
-              : "Create Account"}
-        </button>
-      </form>
-
-      <p className="mt-6 text-sm leading-6 text-zinc-500 dark:text-zinc-400">
-        After signing in, you&apos;ll land on a protected dashboard rendered by
-        a server component. Head back{" "}
-        <Link
-          href="/"
-          className="font-medium text-zinc-950 underline decoration-zinc-300 underline-offset-4 transition-colors hover:text-black hover:decoration-zinc-500 focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-4 focus-visible:ring-offset-white dark:text-zinc-50 dark:decoration-zinc-700 dark:hover:text-white dark:hover:decoration-zinc-400 dark:focus-visible:ring-white dark:focus-visible:ring-offset-black"
-        >
-          home
-        </Link>
-        .
-      </p>
-    </div>
+      <CardFooter className="border-t border-black/5 pt-6 dark:border-white/10">
+        <p className="text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+          After signing in, you&apos;ll land on a protected dashboard rendered
+          by a server component. Head back{" "}
+          <Link
+            href="/"
+            className="font-medium text-zinc-950 underline decoration-zinc-300 underline-offset-4 transition-colors hover:text-black hover:decoration-zinc-500 focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-4 focus-visible:ring-offset-white dark:text-zinc-50 dark:decoration-zinc-700 dark:hover:text-white dark:hover:decoration-zinc-400 dark:focus-visible:ring-white dark:focus-visible:ring-offset-black"
+          >
+            home
+          </Link>
+          .
+        </p>
+      </CardFooter>
+    </Card>
   );
 }

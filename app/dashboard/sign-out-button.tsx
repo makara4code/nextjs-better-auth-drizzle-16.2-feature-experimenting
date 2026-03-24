@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { startTransition, useState } from "react";
 
@@ -13,20 +14,21 @@ export function SignOutButton() {
     setIsPending(true);
     await authClient.signOut();
     startTransition(() => {
-      router.replace("/sign-in");
+      router.replace("/login");
       router.refresh();
     });
     setIsPending(false);
   };
 
   return (
-    <button
+    <Button
       type="button"
-      onClick={signOut}
-      disabled={isPending}
-      className="flex h-12 items-center justify-center rounded-full bg-foreground px-5 text-sm font-semibold text-background transition-colors hover:bg-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-4 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-60 dark:hover:bg-zinc-200 dark:focus-visible:ring-white dark:focus-visible:ring-offset-black"
+      variant="primary"
+      size="md"
+      onPress={signOut}
+      isDisabled={isPending}
     >
-      {isPending ? "Signing Out…" : "Sign Out"}
-    </button>
+      {isPending ? "Signing Out..." : "Sign Out"}
+    </Button>
   );
 }
