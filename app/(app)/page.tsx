@@ -18,13 +18,14 @@ export default function Home() {
         />
         <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
           <h1 className="max-w-xl text-balance text-3xl font-semibold tracking-tight text-black dark:text-zinc-50 sm:text-4xl sm:leading-[1.1]">
-            Next 16 starter with Better Auth, Drizzle, and Postgres wired in.
+            Next 16 starter with Better Auth, Drizzle, Postgres, and Redis
+            wired in.
           </h1>
           <p className="max-w-2xl text-pretty text-base leading-7 text-zinc-600 dark:text-zinc-400 sm:text-lg sm:leading-8">
             This starter now includes email and password auth backed by Better
-            Auth, a Drizzle schema, and the Postgres service from Docker
-            Compose. Log in, create an account, and land on a protected server
-            component dashboard.
+            Auth, a Drizzle schema, the Postgres service from Docker Compose,
+            and a Redis-backed dashboard cache. Log in, create an account, and
+            land on a protected server component dashboard.
           </p>
           <p className="max-w-2xl text-sm leading-6 text-zinc-500 dark:text-zinc-500">
             Your first stop is still{" "}

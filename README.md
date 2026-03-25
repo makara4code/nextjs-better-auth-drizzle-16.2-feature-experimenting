@@ -20,25 +20,45 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Postgres With Docker
+## Postgres + Redis Tooling With Docker
 
-Copy [`.env.example`](./.env.example) to `.env`, then start Postgres:
+Copy [`.env.example`](./.env.example) to `.env`, then start Postgres and
+Redis plus the local inspection tools:
 
 ```bash
-docker compose up -d postgres
+docker compose up -d postgres redis adminer redisinsight
 ```
 
-The database will be available at:
+The services will be available at:
 
 ```bash
 postgresql://postgres:postgres@localhost:5432/app
+redis://localhost:6379
+http://localhost:8080
+http://localhost:5540
 ```
+
+Use these local tools:
+
+- `Adminer` at `http://localhost:8080` for PostgreSQL
+- `Redis Insight` at `http://localhost:5540` for Redis
+
+Suggested local connection details:
+
+- Adminer system: `PostgreSQL`
+- Adminer server: `postgres`
+- Adminer username: `postgres`
+- Adminer password: `postgres`
+- Adminer database: `app`
+- Redis Insight host: `redis`
+- Redis Insight port: `6379`
 
 Useful commands:
 
 ```bash
 docker compose ps
 docker compose logs -f postgres
+docker compose logs -f redis
 docker compose down
 ```
 
@@ -48,6 +68,8 @@ This project now includes:
 
 - Better Auth with email/password authentication
 - Drizzle ORM configured for PostgreSQL
+- Redis wired in for dashboard snapshot caching
+- Better Auth secondary storage backed by Redis when `REDIS_URL` is set, including Redis-first sessions
 - A generated Better Auth schema in [`db/schema.ts`](./db/schema.ts)
 - Auth routes mounted at `/api/auth/[...all]`
 - A demo sign-in page at `/sign-in`

@@ -14,19 +14,22 @@ const statStyles = [
     label: "Total users",
     description: "Accounts stored in Postgres through Drizzle.",
     icon: UsersIcon,
-    valueKey: "users" as const,
+    value: (overview: Awaited<ReturnType<typeof getDashboardOverview>>) =>
+      overview.totals.users,
   },
   {
-    label: "Active sessions",
-    description: "Current Better Auth sessions in the session table.",
+    label: "Session storage",
+    description: "Better Auth session records now resolve from the active auth storage backend.",
     icon: ShieldCheckIcon,
-    valueKey: "sessions" as const,
+    value: (overview: Awaited<ReturnType<typeof getDashboardOverview>>) =>
+      overview.sessionStorage,
   },
   {
     label: "Verified emails",
     description: "Users who have completed email verification.",
     icon: CheckCircle2Icon,
-    valueKey: "verifiedUsers" as const,
+    value: (overview: Awaited<ReturnType<typeof getDashboardOverview>>) =>
+      overview.totals.verifiedUsers,
   },
 ]
 
@@ -44,7 +47,7 @@ export async function OverviewStats() {
               <div>
                 <CardDescription>{item.label}</CardDescription>
                 <CardTitle className="mt-2 text-3xl">
-                  {overview.totals[item.valueKey]}
+                  {item.value(overview)}
                 </CardTitle>
               </div>
               <div className="rounded-xl border border-border/70 bg-muted/50 p-2">

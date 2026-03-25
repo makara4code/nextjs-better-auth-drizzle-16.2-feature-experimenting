@@ -9,8 +9,8 @@ export default function Page() {
         <div className="space-y-1">
           <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
           <p className="text-sm text-muted-foreground">
-            Manually invalidate the cached overview to verify fresh data and
-            cache behavior.
+            Manually invalidate the cached overview to verify the Next cache
+            tag and Redis snapshot refresh together.
           </p>
         </div>
         <RefreshDashboardButton />

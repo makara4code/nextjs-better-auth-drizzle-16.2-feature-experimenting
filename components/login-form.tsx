@@ -31,13 +31,11 @@ export function SignInForm({
   const [values, setValues] = useState(initialValues);
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsPending(true);
     setError(null);
-    setMessage(null);
 
     const result = await authClient.signIn.email({
       email: values.email,
@@ -50,11 +48,9 @@ export function SignInForm({
       return;
     }
 
-    setMessage("Signed in. Redirecting to your dashboard...");
     setValues(initialValues);
     startTransition(() => {
-      router.replace("/dashboard");
-      router.refresh();
+      router.replace("/redirecting?to=%2Fdashboard");
     });
     setIsPending(false);
   };
@@ -114,11 +110,6 @@ export function SignInForm({
               </Field>
 
               <FieldError>{error}</FieldError>
-              {message ? (
-                <FieldDescription className="text-center text-emerald-600">
-                  {message}
-                </FieldDescription>
-              ) : null}
 
               <Field>
                 <Button type="submit" disabled={isPending}>

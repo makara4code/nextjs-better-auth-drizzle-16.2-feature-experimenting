@@ -16,7 +16,7 @@ export async function RecentUsers() {
         <CardTitle>Recent users</CardTitle>
         <CardDescription>
           This panel and the stat cards above both call the same cached server
-          helper, so the dashboard avoids duplicate DB work for identical data.
+          helper, which now persists its dashboard snapshot in Redis too.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">

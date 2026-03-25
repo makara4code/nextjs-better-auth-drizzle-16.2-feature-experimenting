@@ -5,7 +5,7 @@ import { RotateCwIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { startTransition, useState } from "react";
 
-import { refreshDashboardOverview } from "@/app/dashboard/actions";
+import { refreshDashboardOverview } from "@/app/(app)/dashboard/actions";
 
 export function RefreshDashboardButton() {
   const router = useRouter();
