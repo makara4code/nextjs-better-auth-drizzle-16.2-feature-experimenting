@@ -219,7 +219,7 @@ export function renderOrganizationInvitationEmail({
         </div>
       `,
       footer:
-        "Invitation links expire automatically. If you need a fresh invite, ask an organization owner to resend it.",
+        "Invitation links expire automatically. If you need a fresh invite, ask an org admin or org superadmin to resend it.",
     }),
   };
 }

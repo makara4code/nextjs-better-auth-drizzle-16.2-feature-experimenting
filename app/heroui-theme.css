@@ -1,0 +1,63 @@
+/*
+ * HeroUI v3 theme adaptation for this app.
+ *
+ * The installed @heroui/styles package documents CSS-variable theming
+ * rather than a JS theme builder, so we centralize those knobs here and
+ * map them onto the existing app token system.
+ */
+
+:root {
+  --surface: var(--card);
+  --surface-foreground: var(--card-foreground);
+  --surface-secondary: color-mix(in oklch, var(--card) 88%, var(--muted) 12%);
+  --surface-secondary-foreground: var(--card-foreground);
+  --surface-tertiary: color-mix(in oklch, var(--card) 78%, var(--muted) 22%);
+  --surface-tertiary-foreground: var(--card-foreground);
+
+  --overlay: var(--popover);
+  --overlay-foreground: var(--popover-foreground);
+
+  --default: var(--secondary);
+  --default-foreground: var(--secondary-foreground);
+
+  --accent: var(--primary);
+  --accent-foreground: var(--primary-foreground);
+
+  --focus: var(--ring);
+  --link: var(--primary);
+
+  --segment: var(--surface-secondary);
+  --segment-foreground: var(--surface-secondary-foreground);
+
+  --border-width: 1px;
+  --field-border-width: 1px;
+  --field-radius: calc(var(--radius) + 0.125rem);
+
+  --field-background: color-mix(in oklch, var(--background) 96%, var(--foreground) 4%);
+  --field-foreground: var(--foreground);
+  --field-placeholder: color-mix(in oklch, var(--foreground) 52%, transparent);
+  --field-border: var(--input);
+  --field-shadow: 0 0 0 0 transparent;
+
+  --surface-shadow: var(--shadow-sm);
+  --overlay-shadow: var(--shadow-xl);
+}
+
+.dark,
+[data-theme="dark"] {
+  --surface-secondary: color-mix(in oklch, var(--card) 84%, var(--muted) 16%);
+  --surface-tertiary: color-mix(in oklch, var(--card) 72%, var(--muted) 28%);
+
+  --field-background: color-mix(in oklch, var(--background) 92%, var(--foreground) 8%);
+  --field-placeholder: color-mix(in oklch, var(--foreground) 44%, transparent);
+  --field-border: color-mix(in oklch, var(--input) 78%, var(--foreground) 22%);
+
+  --surface-shadow: 0 0 0 1px color-mix(in oklch, var(--border) 85%, transparent);
+  --overlay-shadow:
+    0 24px 48px -24px color-mix(in oklch, var(--foreground) 22%, transparent),
+    0 0 0 1px color-mix(in oklch, var(--border) 82%, transparent);
+}
+
+.table__column {
+  color: var(--foreground);
+}

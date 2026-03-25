@@ -32,7 +32,7 @@ export function NavMain({
 }: {
   items: {
     title: string
-    url: string
+    url?: string
     icon?: React.ReactNode
     isActive?: boolean
     items?: {
@@ -80,16 +80,22 @@ export function NavMain({
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => {
-          const isDirectLinkActive = isPathActive(pathname, item.url)
+          const isDirectLinkActive = item.url
+            ? isPathActive(pathname, item.url)
+            : false
           const hasActiveSubItem = item.items?.some((subItem) =>
             isPathActive(pathname, subItem.url)
           )
 
           if (!item.items?.length) {
+            if (!item.url) {
+              return null
+            }
+
             return (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton
-                  data-active={isDirectLinkActive}
+                  isActive={isDirectLinkActive}
                   tooltip={item.title}
                   render={<Link href={item.url} />}
                 >
@@ -114,7 +120,12 @@ export function NavMain({
               render={<SidebarMenuItem />}
             >
               <CollapsibleTrigger
-                render={<SidebarMenuButton tooltip={item.title} />}
+                render={
+                  <SidebarMenuButton
+                    tooltip={item.title}
+                    isActive={Boolean(item.isActive || hasActiveSubItem || isDirectLinkActive)}
+                  />
+                }
               >
                 {item.icon}
                 <span>{item.title}</span>
@@ -128,7 +139,7 @@ export function NavMain({
                     return (
                       <SidebarMenuSubItem key={subItem.title}>
                         <SidebarMenuSubButton
-                          data-active={isActive}
+                          isActive={isActive}
                           render={<Link href={subItem.url} />}
                         >
                           <span>{subItem.title}</span>

@@ -1,12 +1,11 @@
 import type { ReactNode } from "react"
 import { Suspense } from "react"
-import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { connection } from "next/server"
 
 import { DashboardHeader } from "@/components/app/dashboard-header"
 import { AppSidebar } from "@/components/app-sidebar"
-import { auth } from "@/lib/auth"
+import { getAppShellState } from "@/lib/auth/capabilities"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 
 function DashboardLayoutFallback() {
@@ -34,17 +33,20 @@ async function DashboardLayoutContent({
 }) {
   await connection()
 
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  })
+  const shellState = await getAppShellState()
 
-  if (!session) {
+  if (!shellState) {
     redirect("/sign-in")
   }
 
   return (
     <SidebarProvider>
-      <AppSidebar user={session.user} />
+      <AppSidebar
+        user={shellState.session.user}
+        navigation={shellState.navigation}
+        organizations={shellState.organizations}
+        activeOrganization={shellState.activeOrganization}
+      />
       <SidebarInset>
         <DashboardHeader />
         <div className="flex flex-1 flex-col px-4 pb-8 pt-6 sm:px-6 lg:px-8">

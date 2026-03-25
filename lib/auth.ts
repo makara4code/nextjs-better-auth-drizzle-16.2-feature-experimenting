@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { emailOTP, organization } from "better-auth/plugins";
+import { admin, emailOTP, organization } from "better-auth/plugins";
+import { eq } from "drizzle-orm";
 
 import { db } from "../db";
 import * as schema from "../db/schema";
@@ -13,6 +14,12 @@ import {
   renderOtpEmail,
   sendEmail,
 } from "./email";
+import {
+  internalPlatformDefaultRole,
+  organizationAc,
+  organizationRoles,
+  platformRoles,
+} from "./auth/permissions";
 import { getRedisClient } from "./redis";
 
 const baseURL = process.env.BETTER_AUTH_URL ?? "http://localhost:3000";
@@ -69,6 +76,24 @@ export const auth = betterAuth({
     provider: "pg",
     schema,
   }),
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (createdUser) => {
+          if (createdUser.role !== internalPlatformDefaultRole) {
+            return;
+          }
+
+          await db
+            .update(schema.user)
+            .set({
+              role: null,
+            })
+            .where(eq(schema.user.id, createdUser.id));
+        },
+      },
+    },
+  },
   ...(redisSecondaryStorage
     ? {
         secondaryStorage: redisSecondaryStorage,
@@ -92,12 +117,19 @@ export const auth = betterAuth({
   },
   plugins: [
     organization({
+      ac: organizationAc,
       allowUserToCreateOrganization: true,
+      creatorRole: "org_superadmin",
       membershipLimit: 250,
       invitationLimit: 250,
       invitationExpiresIn: 60 * 60 * 24 * 2,
       cancelPendingInvitationsOnReInvite: true,
       requireEmailVerificationOnInvitation: true,
+      roles: organizationRoles,
+      dynamicAccessControl: {
+        enabled: true,
+        maximumRolesPerOrganization: 25,
+      },
       sendInvitationEmail: async (data) => {
         const inviteLink = `${baseURL}/accept-invitation?invitationId=${encodeURIComponent(data.id)}`;
         const emailContent = renderOrganizationInvitationEmail({
@@ -115,6 +147,11 @@ export const auth = betterAuth({
           html: emailContent.html,
         });
       },
+    }),
+    admin({
+      defaultRole: internalPlatformDefaultRole,
+      adminRoles: ["global_admin", "global_superadmin"],
+      roles: platformRoles,
     }),
     emailOTP({
       overrideDefaultEmailVerification: true,

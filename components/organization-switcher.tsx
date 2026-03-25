@@ -26,6 +26,7 @@ import {
   ChevronsUpDownIcon,
   PlusIcon,
 } from "lucide-react";
+import type { AppShellState } from "@/lib/auth/capabilities";
 
 function getAuthErrorMessage(error: unknown, fallback: string) {
   if (!error || typeof error !== "object") {
@@ -42,11 +43,15 @@ function getAuthErrorMessage(error: unknown, fallback: string) {
   return authError.message ?? authError.error?.message ?? fallback;
 }
 
-export function OrganizationSwitcher() {
+export function OrganizationSwitcher({
+  organizations,
+  activeOrganization,
+}: {
+  organizations: AppShellState["organizations"];
+  activeOrganization: AppShellState["activeOrganization"];
+}) {
   const { isMobile } = useSidebar();
   const router = useRouter();
-  const { data: organizations, isPending } = authClient.useListOrganizations();
-  const { data: activeOrganization } = authClient.useActiveOrganization();
   const [error, setError] = useState<string | null>(null);
   const [pendingOrganizationId, setPendingOrganizationId] = useState<
     string | null
@@ -121,9 +126,7 @@ export function OrganizationSwitcher() {
               <DropdownMenuLabel className="text-xs text-muted-foreground">
                 Organizations
               </DropdownMenuLabel>
-              {isPending ? (
-                <DropdownMenuItem disabled>Loading organizations...</DropdownMenuItem>
-              ) : organizations?.length ? (
+              {organizations.length ? (
                 organizations.map((organization) => {
                   const isActive = activeOrganization?.id === organization.id;
                   const isSwitching = pendingOrganizationId === organization.id;
@@ -173,7 +176,7 @@ export function OrganizationSwitcher() {
             <DropdownMenuGroup>
               <DropdownMenuItem
                 className="gap-2 p-2"
-                onClick={() => router.push("/organizations")}
+                onClick={() => router.push("/organizations/workspace")}
               >
                 <div className="flex size-6 items-center justify-center rounded-md border border-dashed border-border/70 bg-transparent">
                   <PlusIcon className="size-4" />

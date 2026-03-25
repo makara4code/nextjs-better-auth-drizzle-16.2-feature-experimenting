@@ -91,10 +91,35 @@ Useful commands:
 bun run auth:generate
 bun run db:generate
 bun run db:migrate
+npm run cli -- --email your@email.com --role global_admin
+npm run cli -- create-user --email admin@example.com --password "replace-me" --role global_superadmin
 ```
 
 When you create an account locally, the verification email will be captured by
 Mailpit at `http://localhost:8025`.
+
+To bootstrap the first global operator, you can create the account directly from
+the CLI:
+
+```bash
+npm run cli -- create-user --email admin@example.com --name "Platform Admin" --password "replace-me" --role global_superadmin
+npm run cli -- create-admin --email admin@example.com --password "replace-me"
+npm run cli -- create-superadmin --email owner@example.com --password "replace-me"
+npm run cli -- --email your@email.com --role global_admin
+npm run cli -- --email your@email.com --role global_superadmin
+npm run cli -- --email your@email.com --role none
+npm run cli -- --list-users
+npm run cli -- --email your@email.com --dry-run
+npm run cli -- --help
+```
+
+CLI-created users default to `emailVerified=true` so they can sign in
+immediately in local development. The script also supports
+`GLOBAL_PLATFORM_EMAIL`, `GLOBAL_PLATFORM_ROLE`, `GLOBAL_PLATFORM_NAME`, and
+`GLOBAL_PLATFORM_PASSWORD` from `.env`, while still accepting the older
+`GLOBAL_ADMIN_EMAIL` and `GLOBAL_ADMIN_ROLE` names as fallbacks. If your local
+database only contains one user, the CLI can auto-pick that user when no email
+is provided for role updates.
 
 ## Learn More
 

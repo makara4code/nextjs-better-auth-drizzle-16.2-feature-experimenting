@@ -1,26 +1,33 @@
-import { headers } from "next/headers"
+import { redirect } from "next/navigation"
 import Link from "next/link"
 
 import { RefreshDashboardButton } from "@/components/dashboard/refresh-dashboard-button"
 import { OverviewStats } from "@/components/dashboard/overview-stats"
 import { RecentUsers } from "@/components/dashboard/recent-users"
 import { Button } from "@/components/ui/button"
-import { auth } from "@/lib/auth"
+import {
+  getAppShellState,
+  shouldRedirectToOrganizationOnboarding,
+} from "@/lib/auth/capabilities"
 
 export default async function Page() {
-  const requestHeaders = await headers()
-  const session = await auth.api.getSession({
-    headers: requestHeaders,
-  })
-  const activeOrganization =
-    session?.session.activeOrganizationId
-      ? await auth.api.getFullOrganization({
-          headers: requestHeaders,
-          query: {
-            organizationId: session.session.activeOrganizationId,
-          },
-        })
-      : null
+  const shellState = await getAppShellState()
+
+  if (!shellState) {
+    redirect("/sign-in")
+  }
+
+  if (
+    !shellState.activeOrganization &&
+    shouldRedirectToOrganizationOnboarding({
+      hasOrganizationMembership: shellState.hasOrganizationMembership,
+      platformRole: shellState.platformRole,
+    })
+  ) {
+    redirect("/organizations")
+  }
+
+  const activeOrganization = shellState.activeOrganization
 
   return (
     <div className="flex flex-col gap-6">
@@ -30,12 +37,18 @@ export default async function Page() {
           <p className="text-sm text-muted-foreground">
             {activeOrganization
               ? `Viewing ${activeOrganization.name}. Dashboard metrics now follow the active organization in your Better Auth session.`
-              : "Pick or create an organization to turn this into a true tenant-scoped workspace. Until then, the dashboard stays global."}
+              : shellState.platformRole
+                ? "No organization is active, so this dashboard is showing platform-level summary data for the current operator."
+                : "Pick or create an organization to turn this into a true tenant-scoped workspace."}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           {!activeOrganization ? (
-            <Button variant="outline" render={<Link href="/organizations" />}>
+            <Button
+              variant="outline"
+              nativeButton={false}
+              render={<Link href="/organizations" />}
+            >
               Open organizations
             </Button>
           ) : null}

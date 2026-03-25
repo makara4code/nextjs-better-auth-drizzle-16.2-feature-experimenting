@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "@heroui/styles";
+@import "./heroui-theme.css";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 

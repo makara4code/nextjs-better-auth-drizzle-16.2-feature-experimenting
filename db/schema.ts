@@ -5,6 +5,7 @@ import {
   pgTable,
   text,
   timestamp,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
@@ -13,6 +14,10 @@ export const user = pgTable("user", {
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified").default(false).notNull(),
   image: text("image"),
+  role: text("role"),
+  banned: boolean("banned").default(false),
+  banReason: text("ban_reason"),
+  banExpires: timestamp("ban_expires"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
@@ -35,6 +40,9 @@ export const session = pgTable(
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
+    impersonatedBy: text("impersonated_by").references(() => user.id, {
+      onDelete: "set null",
+    }),
     activeOrganizationId: text("active_organization_id").references(
       () => organization.id,
       { onDelete: "set null" },
@@ -42,6 +50,7 @@ export const session = pgTable(
   },
   (table) => [
     index("session_userId_idx").on(table.userId),
+    index("session_impersonatedBy_idx").on(table.impersonatedBy),
     index("session_activeOrganizationId_idx").on(table.activeOrganizationId),
   ],
 );
@@ -144,17 +153,88 @@ export const invitation = pgTable(
   ],
 );
 
+export const organizationRole = pgTable(
+  "organization_role",
+  {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organization.id, { onDelete: "cascade" }),
+    role: text("role").notNull(),
+    permission: text("permission").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date()),
+  },
+  (table) => [
+    index("organizationRole_organizationId_idx").on(table.organizationId),
+    uniqueIndex("organizationRole_organizationId_role_idx").on(
+      table.organizationId,
+      table.role,
+    ),
+  ],
+);
+
+export const project = pgTable(
+  "project",
+  {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organization.id, { onDelete: "cascade" }),
+    slug: text("slug").notNull(),
+    name: text("name").notNull(),
+    description: text("description"),
+    status: text("status").notNull().default("active"),
+    visibility: text("visibility").notNull().default("organization"),
+    createdByUserId: text("created_by_user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    updatedByUserId: text("updated_by_user_id").references(() => user.id, {
+      onDelete: "set null",
+    }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("project_organizationId_idx").on(table.organizationId),
+    index("project_createdByUserId_idx").on(table.createdByUserId),
+    uniqueIndex("project_organizationId_slug_idx").on(
+      table.organizationId,
+      table.slug,
+    ),
+  ],
+);
+
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
+  impersonatedSessions: many(session, {
+    relationName: "session_impersonator",
+  }),
   accounts: many(account),
   memberships: many(member),
   invitationsSent: many(invitation),
+  createdProjects: many(project, {
+    relationName: "project_creator",
+  }),
+  updatedProjects: many(project, {
+    relationName: "project_updater",
+  }),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
   user: one(user, {
     fields: [session.userId],
     references: [user.id],
+  }),
+  impersonator: one(user, {
+    fields: [session.impersonatedBy],
+    references: [user.id],
+    relationName: "session_impersonator",
   }),
   activeOrganization: one(organization, {
     fields: [session.activeOrganizationId],
@@ -172,6 +252,8 @@ export const accountRelations = relations(account, ({ one }) => ({
 export const organizationRelations = relations(organization, ({ many }) => ({
   members: many(member),
   invitations: many(invitation),
+  roles: many(organizationRole),
+  projects: many(project),
   sessions: many(session),
 }));
 
@@ -194,5 +276,32 @@ export const invitationRelations = relations(invitation, ({ one }) => ({
   inviter: one(user, {
     fields: [invitation.inviterId],
     references: [user.id],
+  }),
+}));
+
+export const organizationRoleRelations = relations(
+  organizationRole,
+  ({ one }) => ({
+    organization: one(organization, {
+      fields: [organizationRole.organizationId],
+      references: [organization.id],
+    }),
+  }),
+);
+
+export const projectRelations = relations(project, ({ one }) => ({
+  organization: one(organization, {
+    fields: [project.organizationId],
+    references: [organization.id],
+  }),
+  createdBy: one(user, {
+    fields: [project.createdByUserId],
+    references: [user.id],
+    relationName: "project_creator",
+  }),
+  updatedBy: one(user, {
+    fields: [project.updatedByUserId],
+    references: [user.id],
+    relationName: "project_updater",
   }),
 }));

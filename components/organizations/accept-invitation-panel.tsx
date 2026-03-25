@@ -150,8 +150,14 @@ export function AcceptInvitationPanel({
                   account.
                 </FieldDescription>
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <Button render={<Link href={signInHref} />}>Sign in</Button>
-                  <Button variant="outline" render={<Link href={signUpHref} />}>
+                  <Button nativeButton={false} render={<Link href={signInHref} />}>
+                    Sign in
+                  </Button>
+                  <Button
+                    variant="outline"
+                    nativeButton={false}
+                    render={<Link href={signUpHref} />}
+                  >
                     Create account
                   </Button>
                 </div>
@@ -161,7 +167,9 @@ export function AcceptInvitationPanel({
                 <FieldDescription className="text-center">
                   Verify your email before accepting this invitation.
                 </FieldDescription>
-                <Button render={<Link href={verifyHref} />}>Verify email</Button>
+                <Button nativeButton={false} render={<Link href={verifyHref} />}>
+                  Verify email
+                </Button>
               </>
             ) : (
               <>
