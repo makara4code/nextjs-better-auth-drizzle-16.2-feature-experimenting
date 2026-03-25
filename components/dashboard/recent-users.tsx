@@ -7,23 +7,31 @@ import {
 } from "@/components/ui/card"
 import { getDashboardOverview } from "@/lib/dashboard-data"
 
-export async function RecentUsers() {
-  const overview = await getDashboardOverview()
+export async function RecentUsers({
+  organizationId,
+  organizationName,
+}: {
+  organizationId?: string | null
+  organizationName?: string | null
+}) {
+  const overview = await getDashboardOverview(organizationId)
 
   return (
     <Card className="overflow-hidden">
       <CardHeader>
-        <CardTitle>Recent users</CardTitle>
+        <CardTitle>{organizationId ? "Recent members" : "Recent users"}</CardTitle>
         <CardDescription>
-          This panel and the stat cards above both call the same cached server
-          helper, which now persists its dashboard snapshot in Redis too.
+          {organizationId
+            ? `Newest people attached to ${organizationName ?? "the active organization"}.`
+            : "This panel and the stat cards above both call the same cached server helper, which now persists its dashboard snapshot in Redis too."}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
         {overview.recentUsers.length === 0 ? (
           <div className="rounded-xl border border-dashed border-border/70 bg-muted/30 p-6 text-sm text-muted-foreground">
-            No users yet. Create an account from the login page to see records
-            here.
+            {organizationId
+              ? "No members have joined this organization yet."
+              : "No users yet. Create an account from the login page to see records here."}
           </div>
         ) : (
           <div className="space-y-3">

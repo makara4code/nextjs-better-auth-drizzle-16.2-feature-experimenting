@@ -1,6 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { emailOTP } from "better-auth/plugins";
+import { emailOTP, organization } from "better-auth/plugins";
 
 import { db } from "../db";
 import * as schema from "../db/schema";
@@ -8,7 +8,11 @@ import {
   BETTER_AUTH_SESSION_DATA_COOKIE,
   BETTER_AUTH_SESSION_TOKEN_COOKIE,
 } from "./auth-cookies";
-import { renderOtpEmail, sendEmail } from "./email";
+import {
+  renderOrganizationInvitationEmail,
+  renderOtpEmail,
+  sendEmail,
+} from "./email";
 import { getRedisClient } from "./redis";
 
 const baseURL = process.env.BETTER_AUTH_URL ?? "http://localhost:3000";
@@ -87,6 +91,31 @@ export const auth = betterAuth({
     requireEmailVerification: true,
   },
   plugins: [
+    organization({
+      allowUserToCreateOrganization: true,
+      membershipLimit: 250,
+      invitationLimit: 250,
+      invitationExpiresIn: 60 * 60 * 24 * 2,
+      cancelPendingInvitationsOnReInvite: true,
+      requireEmailVerificationOnInvitation: true,
+      sendInvitationEmail: async (data) => {
+        const inviteLink = `${baseURL}/accept-invitation?invitationId=${encodeURIComponent(data.id)}`;
+        const emailContent = renderOrganizationInvitationEmail({
+          appName: "Next 16 Starter",
+          organizationName: data.organization.name,
+          inviterName: data.inviter.user.name,
+          role: data.role,
+          inviteLink,
+        });
+
+        await sendEmail({
+          to: data.email,
+          subject: `Invitation to join ${data.organization.name}`,
+          text: emailContent.text,
+          html: emailContent.html,
+        });
+      },
+    }),
     emailOTP({
       overrideDefaultEmailVerification: true,
       rateLimit: {

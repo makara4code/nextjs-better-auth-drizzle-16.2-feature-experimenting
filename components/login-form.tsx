@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { startTransition, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { startTransition, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,6 +17,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
+import { createRedirectingRoute, getSafeInternalPath } from "@/lib/redirects";
 import { cn } from "@/lib/utils";
 
 const initialValues = {
@@ -23,11 +25,12 @@ const initialValues = {
   password: "",
 };
 
-function createVerificationRoute(email: string) {
-  const params = new URLSearchParams({
-    email,
-    reason: "unverified",
-  });
+function createVerificationRoute(email: string, from?: string) {
+  const params = new URLSearchParams({ email, reason: "unverified" });
+
+  if (from) {
+    params.set("from", from);
+  }
 
   return `/verify-email?${params.toString()}`;
 }
@@ -59,9 +62,23 @@ export function SignInForm({
   ...props
 }: React.ComponentProps<"div">) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [values, setValues] = useState(initialValues);
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const destination = useMemo(
+    () => getSafeInternalPath(searchParams.get("from"), "/dashboard"),
+    [searchParams],
+  );
+  const signUpHref = useMemo(() => {
+    const params = new URLSearchParams();
+
+    if (destination !== "/dashboard") {
+      params.set("from", destination);
+    }
+
+    return params.size > 0 ? `/sign-up?${params.toString()}` : "/sign-up";
+  }, [destination]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -76,7 +93,9 @@ export function SignInForm({
     if (result.error) {
       if (isEmailNotVerifiedError(result.error)) {
         startTransition(() => {
-          router.replace(createVerificationRoute(values.email.trim()));
+          router.replace(
+            createVerificationRoute(values.email.trim(), destination),
+          );
         });
         setIsPending(false);
         return;
@@ -89,7 +108,7 @@ export function SignInForm({
 
     setValues(initialValues);
     startTransition(() => {
-      router.replace("/redirecting?to=%2Fdashboard");
+      router.replace(createRedirectingRoute(destination));
     });
     setIsPending(false);
   };
@@ -192,7 +211,7 @@ export function SignInForm({
 
               <FieldDescription className="text-center">
                 Need a new account?{" "}
-                <Link href="/sign-up" className="underline underline-offset-4">
+                <Link href={signUpHref} className="underline underline-offset-4">
                   Create one
                 </Link>
                 .

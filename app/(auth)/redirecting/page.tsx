@@ -2,21 +2,14 @@
 
 import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-
-function getSafeDestination(value: string | null) {
-  if (!value || !value.startsWith("/") || value.startsWith("//")) {
-    return "/";
-  }
-
-  return value;
-}
+import { getSafeInternalPath } from "@/lib/redirects";
 
 function RedirectingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const destination = getSafeDestination(searchParams.get("to"));
+    const destination = getSafeInternalPath(searchParams.get("to"));
 
     router.replace(destination);
   }, [router, searchParams]);

@@ -7,7 +7,11 @@ import { startTransition, useState } from "react";
 
 import { refreshDashboardOverview } from "@/app/(app)/dashboard/actions";
 
-export function RefreshDashboardButton() {
+export function RefreshDashboardButton({
+  organizationId,
+}: {
+  organizationId?: string | null
+}) {
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
 
@@ -17,7 +21,7 @@ export function RefreshDashboardButton() {
     }
 
     setIsPending(true);
-    await refreshDashboardOverview();
+    await refreshDashboardOverview(organizationId);
     startTransition(() => {
       router.refresh();
     });

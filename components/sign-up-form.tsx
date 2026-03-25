@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { startTransition, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { startTransition, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
+import { getSafeInternalPath } from "@/lib/redirects";
 import { cn } from "@/lib/utils";
 
 const initialValues = {
@@ -24,11 +25,15 @@ const initialValues = {
   password: "",
 };
 
-function createVerificationRoute(email: string) {
+function createVerificationRoute(email: string, from?: string) {
   const params = new URLSearchParams({
     email,
     sent: "1",
   });
+
+  if (from) {
+    params.set("from", from);
+  }
 
   return `/verify-email?${params.toString()}`;
 }
@@ -38,9 +43,23 @@ export function SignUpForm({
   ...props
 }: React.ComponentProps<"div">) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [values, setValues] = useState(initialValues);
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const destination = useMemo(
+    () => getSafeInternalPath(searchParams.get("from"), "/dashboard"),
+    [searchParams],
+  );
+  const signInHref = useMemo(() => {
+    const params = new URLSearchParams();
+
+    if (destination !== "/dashboard") {
+      params.set("from", destination);
+    }
+
+    return params.size > 0 ? `/sign-in?${params.toString()}` : "/sign-in";
+  }, [destination]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -59,7 +78,10 @@ export function SignUpForm({
       return;
     }
 
-    const verificationRoute = createVerificationRoute(values.email.trim());
+    const verificationRoute = createVerificationRoute(
+      values.email.trim(),
+      destination,
+    );
 
     setValues(initialValues);
     startTransition(() => {
@@ -154,7 +176,7 @@ export function SignUpForm({
               </FieldSeparator>
 
               <FieldDescription className="text-center">
-                <Link href="/sign-in" className="underline underline-offset-4">
+                <Link href={signInHref} className="underline underline-offset-4">
                   Sign in instead
                 </Link>
                 .

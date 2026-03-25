@@ -22,6 +22,14 @@ type OtpEmailInput = {
   otp: string;
 };
 
+type OrganizationInvitationEmailInput = {
+  appName: string;
+  organizationName: string;
+  inviterName: string;
+  role: string;
+  inviteLink: string;
+};
+
 declare global {
   var __mailTransporter: nodemailer.Transporter | undefined;
 }
@@ -153,6 +161,65 @@ export function renderOtpEmail({
           For security, request a new code if this one expires.
         </div>
       `,
+    }),
+  };
+}
+
+export function renderOrganizationInvitationEmail({
+  appName,
+  organizationName,
+  inviterName,
+  role,
+  inviteLink,
+}: OrganizationInvitationEmailInput) {
+  const safeOrganizationName = escapeHtml(organizationName);
+  const safeInviterName = escapeHtml(inviterName);
+  const safeRole = escapeHtml(role);
+  const safeInviteLink = escapeHtml(inviteLink);
+
+  return {
+    text: [
+      `${appName}`,
+      "",
+      `${safeInviterName} invited you to join ${safeOrganizationName}.`,
+      `Role: ${safeRole}`,
+      "",
+      `Accept the invitation: ${inviteLink}`,
+      "",
+      "If you were not expecting this invite, you can ignore this email.",
+    ].join("\n"),
+    html: renderEmailTemplate({
+      preview: `Join ${organizationName} on ${appName}`,
+      eyebrow: appName,
+      title: `You're invited to ${organizationName}`,
+      description: `${inviterName} invited you to join ${organizationName} as a ${role}.`,
+      bodyHtml: `
+        <div style="display: grid; gap: 14px;">
+          <div style="border: 1px solid #e4e4e7; border-radius: 14px; background-color: #fafafa; padding: 18px 16px;">
+            <div style="margin: 0 0 6px; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #71717a;">
+              Organization
+            </div>
+            <div style="font-size: 20px; line-height: 1.3; font-weight: 600; color: #09090b; word-break: break-word;">
+              ${safeOrganizationName}
+            </div>
+            <div style="margin-top: 8px; font-size: 14px; line-height: 1.7; color: #52525b;">
+              You'll join as <strong style="color: #09090b;">${safeRole}</strong>.
+            </div>
+          </div>
+          <a
+            href="${safeInviteLink}"
+            style="display: inline-flex; width: fit-content; align-items: center; justify-content: center; border-radius: 12px; background-color: #09090b; color: #fafafa; font-size: 14px; font-weight: 600; line-height: 1; padding: 14px 18px; text-decoration: none;"
+          >
+            Accept invitation
+          </a>
+          <div style="font-size: 14px; line-height: 1.7; color: #52525b;">
+            If the button does not work, copy and paste this link into your browser:<br />
+            <a href="${safeInviteLink}" style="color: #09090b; word-break: break-all;">${safeInviteLink}</a>
+          </div>
+        </div>
+      `,
+      footer:
+        "Invitation links expire automatically. If you need a fresh invite, ask an organization owner to resend it.",
     }),
   };
 }

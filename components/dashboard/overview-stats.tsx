@@ -9,32 +9,55 @@ import {
 } from "@/components/ui/card"
 import { getDashboardOverview } from "@/lib/dashboard-data"
 
-const statStyles = [
-  {
-    label: "Total users",
-    description: "Accounts stored in Postgres through Drizzle.",
-    icon: UsersIcon,
-    value: (overview: Awaited<ReturnType<typeof getDashboardOverview>>) =>
-      overview.totals.users,
-  },
-  {
-    label: "Session storage",
-    description: "Better Auth session records now resolve from the active auth storage backend.",
-    icon: ShieldCheckIcon,
-    value: (overview: Awaited<ReturnType<typeof getDashboardOverview>>) =>
-      overview.sessionStorage,
-  },
-  {
-    label: "Verified emails",
-    description: "Users who have completed email verification.",
-    icon: CheckCircle2Icon,
-    value: (overview: Awaited<ReturnType<typeof getDashboardOverview>>) =>
-      overview.totals.verifiedUsers,
-  },
-]
-
-export async function OverviewStats() {
-  const overview = await getDashboardOverview()
+export async function OverviewStats({
+  organizationId,
+  organizationName,
+}: {
+  organizationId?: string | null
+  organizationName?: string | null
+}) {
+  const overview = await getDashboardOverview(organizationId)
+  const statStyles = organizationId
+    ? [
+        {
+          label: "Members",
+          description: `People currently assigned to ${organizationName ?? "the active organization"}.`,
+          icon: UsersIcon,
+          value: overview.totals.users,
+        },
+        {
+          label: "Pending invites",
+          description: "Invitation links still waiting to be accepted.",
+          icon: ShieldCheckIcon,
+          value: overview.totals.pendingInvitations,
+        },
+        {
+          label: "Verified members",
+          description: "Members whose accounts have completed email verification.",
+          icon: CheckCircle2Icon,
+          value: overview.totals.verifiedUsers,
+        },
+      ]
+    : [
+        {
+          label: "Total users",
+          description: "Accounts stored in Postgres through Drizzle.",
+          icon: UsersIcon,
+          value: overview.totals.users,
+        },
+        {
+          label: "Session storage",
+          description: "Better Auth session records now resolve from the active auth storage backend.",
+          icon: ShieldCheckIcon,
+          value: overview.sessionStorage,
+        },
+        {
+          label: "Verified emails",
+          description: "Users who have completed email verification.",
+          icon: CheckCircle2Icon,
+          value: overview.totals.verifiedUsers,
+        },
+      ]
 
   return (
     <div className="grid auto-rows-min gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -47,7 +70,7 @@ export async function OverviewStats() {
               <div>
                 <CardDescription>{item.label}</CardDescription>
                 <CardTitle className="mt-2 text-3xl">
-                  {item.value(overview)}
+                  {item.value}
                 </CardTitle>
               </div>
               <div className="rounded-xl border border-border/70 bg-muted/50 p-2">

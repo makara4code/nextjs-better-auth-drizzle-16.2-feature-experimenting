@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { startTransition, useEffect, useState } from "react";
+import { startTransition, useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
+import { createRedirectingRoute, getSafeInternalPath } from "@/lib/redirects";
 import { cn } from "@/lib/utils";
 
 const initialValues = {
@@ -55,8 +56,30 @@ export function VerifyEmailForm({
   const [isResending, setIsResending] = useState(false);
 
   const presetEmail = getQueryValue(searchParams.get("email"));
+  const destination = useMemo(
+    () => getSafeInternalPath(searchParams.get("from"), "/dashboard"),
+    [searchParams],
+  );
   const isFromBlockedSignIn = searchParams.get("reason") === "unverified";
   const showSentNotice = searchParams.get("sent") === "1";
+  const signInHref = useMemo(() => {
+    const params = new URLSearchParams();
+
+    if (destination !== "/dashboard") {
+      params.set("from", destination);
+    }
+
+    return params.size > 0 ? `/sign-in?${params.toString()}` : "/sign-in";
+  }, [destination]);
+  const signUpHref = useMemo(() => {
+    const params = new URLSearchParams();
+
+    if (destination !== "/dashboard") {
+      params.set("from", destination);
+    }
+
+    return params.size > 0 ? `/sign-up?${params.toString()}` : "/sign-up";
+  }, [destination]);
 
   useEffect(() => {
     if (!presetEmail) {
@@ -122,7 +145,7 @@ export function VerifyEmailForm({
     });
     setNotice("Email verified. Redirecting to your dashboard...");
     startTransition(() => {
-      router.replace("/redirecting?to=%2Fdashboard");
+      router.replace(createRedirectingRoute(destination));
     });
     setIsVerifying(false);
   };
@@ -241,7 +264,7 @@ export function VerifyEmailForm({
 
               <FieldDescription className="text-center">
                 Already verified?{" "}
-                <Link href="/sign-in" className="underline underline-offset-4">
+                <Link href={signInHref} className="underline underline-offset-4">
                   Return to sign in
                 </Link>
                 .
@@ -261,7 +284,7 @@ export function VerifyEmailForm({
 
       <FieldDescription className="px-6 text-center">
         Need a new account?{" "}
-        <Link href="/sign-up" className="underline underline-offset-4">
+        <Link href={signUpHref} className="underline underline-offset-4">
           Create one
         </Link>
         .
