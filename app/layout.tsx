@@ -1,11 +1,18 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter } from "next/font/google";
+import {
+  Geist,
+  Geist_Mono,
+  Inter,
+  JetBrains_Mono,
+  Source_Serif_4,
+} from "next/font/google";
 import { cn } from "@/lib/utils";
+import { AppSettingsProvider } from "@/components/app-settings-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,6 +22,18 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const sourceSerif = Source_Serif_4({
+  variable: "--font-source-serif",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const jetBrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
   subsets: ["latin"],
   display: "swap",
 });
@@ -39,6 +58,8 @@ export default function RootLayout({
         "antialiased",
         geistSans.variable,
         geistMono.variable,
+        sourceSerif.variable,
+        jetBrainsMono.variable,
         "font-sans",
         inter.variable,
       )}
@@ -56,7 +77,9 @@ export default function RootLayout({
           >
             Skip to main content
           </a>
-          <div className="flex min-h-full flex-col">{children}</div>
+          <AppSettingsProvider>
+            <div className="flex min-h-full flex-col">{children}</div>
+          </AppSettingsProvider>
         </ThemeProvider>
       </body>
     </html>
