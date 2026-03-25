@@ -54,9 +54,9 @@ export default function Home() {
         <div className="flex w-full flex-col gap-4 text-base font-medium sm:w-auto sm:flex-row">
           <Link
             className="flex h-12 w-full items-center justify-center rounded-full bg-foreground px-5 text-background transition-colors hover:bg-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-4 focus-visible:ring-offset-white dark:hover:bg-zinc-200 dark:focus-visible:ring-white dark:focus-visible:ring-offset-black sm:w-auto sm:min-w-40"
-            href="/login"
+            href="/sign-in"
           >
-            Open Login
+            Open Sign In
           </Link>
           <Link
             className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/10 px-5 text-zinc-950 transition-colors hover:border-black/20 hover:bg-black/[.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-4 focus-visible:ring-offset-white dark:border-white/15 dark:text-zinc-50 dark:hover:bg-white/[0.08] dark:focus-visible:ring-white dark:focus-visible:ring-offset-black sm:w-auto sm:min-w-40"

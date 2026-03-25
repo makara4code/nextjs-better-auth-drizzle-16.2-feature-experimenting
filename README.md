@@ -50,7 +50,8 @@ This project now includes:
 - Drizzle ORM configured for PostgreSQL
 - A generated Better Auth schema in [`db/schema.ts`](./db/schema.ts)
 - Auth routes mounted at `/api/auth/[...all]`
-- A demo login page at `/login`
+- A demo sign-in page at `/sign-in`
+- A demo sign-up page at `/sign-up`
 - A protected demo dashboard at `/dashboard`
 
 Useful commands:

@@ -28,10 +28,10 @@ const navigationItems = [
     description: "Protected server component",
   },
   {
-    href: "/login",
-    label: "Auth",
+    href: "/sign-in",
+    label: "Sign In",
     icon: LogIn,
-    description: "HeroUI login form",
+    description: "Authentication entry page",
   },
 ];
 

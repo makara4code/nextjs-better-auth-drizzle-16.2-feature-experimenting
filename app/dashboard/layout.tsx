@@ -39,7 +39,7 @@ async function DashboardLayoutContent({
   })
 
   if (!session) {
-    redirect("/login")
+    redirect("/sign-in")
   }
 
   return (

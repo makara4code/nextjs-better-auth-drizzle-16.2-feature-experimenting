@@ -22,10 +22,10 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const loginUrl = new URL("/login", request.url);
-  loginUrl.searchParams.set("from", request.nextUrl.pathname);
+  const signInUrl = new URL("/sign-in", request.url);
+  signInUrl.searchParams.set("from", request.nextUrl.pathname);
 
-  return NextResponse.redirect(loginUrl);
+  return NextResponse.redirect(signInUrl);
 }
 
 export const config = {
