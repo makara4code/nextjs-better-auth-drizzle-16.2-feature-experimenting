@@ -8,7 +8,7 @@ import {
   BETTER_AUTH_SESSION_DATA_COOKIE,
   BETTER_AUTH_SESSION_TOKEN_COOKIE,
 } from "./auth-cookies";
-import { sendEmail } from "./email";
+import { renderOtpEmail, sendEmail } from "./email";
 import { getRedisClient } from "./redis";
 
 const baseURL = process.env.BETTER_AUTH_URL ?? "http://localhost:3000";
@@ -102,25 +102,17 @@ export const auth = betterAuth({
               : type === "change-email"
                 ? "confirm your email change"
                 : "verify your email";
+        const emailContent = renderOtpEmail({
+          appName: "Next 16 Starter",
+          actionLabel,
+          otp,
+        });
 
         void sendEmail({
           to: email,
           subject: "Your verification code",
-          text: `Use this verification code to ${actionLabel}: ${otp}`,
-          html: `
-            <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111827;">
-              <h1 style="font-size: 20px; margin-bottom: 16px;">Verification code</h1>
-              <p style="margin-bottom: 16px;">
-                Use this code to ${actionLabel}.
-              </p>
-              <p style="margin-bottom: 24px; font-size: 32px; font-weight: 700; letter-spacing: 0.4em;">
-                ${otp}
-              </p>
-              <p style="font-size: 14px; color: #4b5563;">
-                This code expires soon. If you did not request it, you can ignore this email.
-              </p>
-            </div>
-          `,
+          text: emailContent.text,
+          html: emailContent.html,
         });
       },
     }),
