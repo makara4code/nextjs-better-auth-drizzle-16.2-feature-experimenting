@@ -23,6 +23,37 @@ const initialValues = {
   password: "",
 };
 
+function createVerificationRoute(email: string) {
+  const params = new URLSearchParams({
+    email,
+    reason: "unverified",
+  });
+
+  return `/verify-email?${params.toString()}`;
+}
+
+function isEmailNotVerifiedError(error: unknown) {
+  if (!error || typeof error !== "object") {
+    return false;
+  }
+
+  const authError = error as {
+    code?: string;
+    message?: string;
+    error?: {
+      code?: string;
+      message?: string;
+    };
+  };
+
+  return (
+    authError.code === "EMAIL_NOT_VERIFIED" ||
+    authError.error?.code === "EMAIL_NOT_VERIFIED" ||
+    authError.message === "Email not verified" ||
+    authError.error?.message === "Email not verified"
+  );
+}
+
 export function SignInForm({
   className,
   ...props
@@ -43,6 +74,14 @@ export function SignInForm({
     });
 
     if (result.error) {
+      if (isEmailNotVerifiedError(result.error)) {
+        startTransition(() => {
+          router.replace(createVerificationRoute(values.email.trim()));
+        });
+        setIsPending(false);
+        return;
+      }
+
       setError(result.error.message ?? "Something went wrong.");
       setIsPending(false);
       return;

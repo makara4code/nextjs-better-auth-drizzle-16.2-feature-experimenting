@@ -20,13 +20,13 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Postgres + Redis Tooling With Docker
+## Postgres + Redis + Mail Tooling With Docker
 
 Copy [`.env.example`](./.env.example) to `.env`, then start Postgres and
 Redis plus the local inspection tools:
 
 ```bash
-docker compose up -d postgres redis adminer redisinsight
+docker compose up -d postgres redis adminer redisinsight mailpit
 ```
 
 The services will be available at:
@@ -36,12 +36,15 @@ postgresql://postgres:postgres@localhost:5432/app
 redis://localhost:6379
 http://localhost:8080
 http://localhost:5540
+smtp://localhost:1025
+http://localhost:8025
 ```
 
 Use these local tools:
 
 - `Adminer` at `http://localhost:8080` for PostgreSQL
 - `Redis Insight` at `http://localhost:5540` for Redis
+- `Mailpit` at `http://localhost:8025` for captured email
 
 Suggested local connection details:
 
@@ -52,6 +55,10 @@ Suggested local connection details:
 - Adminer database: `app`
 - Redis Insight host: `redis`
 - Redis Insight port: `6379`
+- SMTP host: `localhost`
+- SMTP port: `1025`
+- SMTP secure: `false`
+- From address: `no-reply@local.test`
 
 Useful commands:
 
@@ -59,6 +66,7 @@ Useful commands:
 docker compose ps
 docker compose logs -f postgres
 docker compose logs -f redis
+docker compose logs -f mailpit
 docker compose down
 ```
 
@@ -70,6 +78,7 @@ This project now includes:
 - Drizzle ORM configured for PostgreSQL
 - Redis wired in for dashboard snapshot caching
 - Better Auth secondary storage backed by Redis when `REDIS_URL` is set, including Redis-first sessions
+- Better Auth verification emails sent through local SMTP / Mailpit on sign-up
 - A generated Better Auth schema in [`db/schema.ts`](./db/schema.ts)
 - Auth routes mounted at `/api/auth/[...all]`
 - A demo sign-in page at `/sign-in`
@@ -83,6 +92,9 @@ bun run auth:generate
 bun run db:generate
 bun run db:migrate
 ```
+
+When you create an account locally, the verification email will be captured by
+Mailpit at `http://localhost:8025`.
 
 ## Learn More
 

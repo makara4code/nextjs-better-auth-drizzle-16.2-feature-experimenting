@@ -24,6 +24,15 @@ const initialValues = {
   password: "",
 };
 
+function createVerificationRoute(email: string) {
+  const params = new URLSearchParams({
+    email,
+    sent: "1",
+  });
+
+  return `/verify-email?${params.toString()}`;
+}
+
 export function SignUpForm({
   className,
   ...props
@@ -50,9 +59,11 @@ export function SignUpForm({
       return;
     }
 
+    const verificationRoute = createVerificationRoute(values.email.trim());
+
     setValues(initialValues);
     startTransition(() => {
-      router.replace("/redirecting?to=%2Fdashboard");
+      router.replace(verificationRoute);
     });
     setIsPending(false);
   };
