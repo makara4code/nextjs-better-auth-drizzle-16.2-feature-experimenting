@@ -33,11 +33,13 @@ export function NavMain({
   items: {
     title: string
     url?: string
+    prefetch?: boolean
     icon?: React.ReactNode
     isActive?: boolean
     items?: {
       title: string
       url: string
+      prefetch?: boolean
     }[]
   }[]
 }) {
@@ -97,7 +99,7 @@ export function NavMain({
                 <SidebarMenuButton
                   isActive={isDirectLinkActive}
                   tooltip={item.title}
-                  render={<Link href={item.url} />}
+                  render={<Link href={item.url} prefetch={item.prefetch} />}
                 >
                   {item.icon}
                   <span>{item.title}</span>
@@ -140,7 +142,12 @@ export function NavMain({
                       <SidebarMenuSubItem key={subItem.title}>
                         <SidebarMenuSubButton
                           isActive={isActive}
-                          render={<Link href={subItem.url} />}
+                          render={
+                            <Link
+                              href={subItem.url}
+                              prefetch={subItem.prefetch}
+                            />
+                          }
                         >
                           <span>{subItem.title}</span>
                         </SidebarMenuSubButton>

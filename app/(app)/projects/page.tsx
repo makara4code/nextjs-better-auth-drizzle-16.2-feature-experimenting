@@ -17,33 +17,53 @@ import { getProjectsForOrganization } from "@/lib/projects";
 
 export default async function ProjectsPage() {
   const { organization } = await getRequiredActiveOrganization();
-  const canReadProjects = await hasOrgPermission(
-    {
-      project: ["read"],
-    },
-    organization.id,
-  );
-  const canCreateProjects = await hasOrgPermission(
-    {
-      project: ["create"],
-    },
-    organization.id,
-  );
-  const canUpdateProjects = await hasOrgPermission(
-    {
-      project: ["update"],
-    },
-    organization.id,
-  );
-  const canDeleteProjects = await hasOrgPermission(
-    {
-      project: ["delete"],
-    },
-    organization.id,
-  );
-  const projects = canReadProjects
+  const [
+    canReadProjects,
+    canCreateProjects,
+    canUpdateProjects,
+    canDeleteProjects,
+  ] = await Promise.all([
+    hasOrgPermission(
+      {
+        project: ["read"],
+      },
+      organization.id,
+    ),
+    hasOrgPermission(
+      {
+        project: ["create"],
+      },
+      organization.id,
+    ),
+    hasOrgPermission(
+      {
+        project: ["update"],
+      },
+      organization.id,
+    ),
+    hasOrgPermission(
+      {
+        project: ["delete"],
+      },
+      organization.id,
+    ),
+  ]);
+  const projectsResult = canReadProjects
     ? await getProjectsForOrganization(organization.id)
-    : [];
+    : null;
+  const projects = projectsResult?.data ?? [];
+
+  console.log("[projects-route] render", {
+    at: new Date().toISOString(),
+    canCreateProjects,
+    canDeleteProjects,
+    canReadProjects,
+    canUpdateProjects,
+    cacheStatus: projectsResult?.cacheStatus ?? "skipped",
+    organizationId: organization.id,
+    organizationSlug: organization.slug,
+    projectCount: projects.length,
+  });
 
   return (
     <div className="flex flex-col gap-6">

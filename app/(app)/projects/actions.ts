@@ -3,7 +3,7 @@
 import { randomUUID } from "node:crypto";
 
 import { and, eq, ne } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 
 import { db } from "@/db";
 import { project } from "@/db/schema";
@@ -12,7 +12,11 @@ import {
   type ProjectStatus,
   projectStatusOptions,
 } from "@/lib/project-constants";
-import { slugifyProjectName } from "@/lib/projects";
+import {
+  getProjectCacheTag,
+  getProjectsCacheTag,
+  slugifyProjectName,
+} from "@/lib/projects";
 
 async function resolveUniqueProjectSlug(
   organizationId: string,
@@ -88,6 +92,7 @@ export async function createProjectAction(formData: FormData) {
   });
 
   revalidatePath("/projects");
+  updateTag(getProjectsCacheTag(organization.id));
 
   return {
     createdByEmail: session.user.email,
@@ -144,6 +149,8 @@ export async function updateProjectAction(formData: FormData) {
   }
 
   revalidatePath("/projects");
+  updateTag(getProjectsCacheTag(organization.id));
+  updateTag(getProjectCacheTag(organization.id, projectId));
 
   return {
     description: description || null,
@@ -178,6 +185,8 @@ export async function deleteProjectAction(formData: FormData) {
   }
 
   revalidatePath("/projects");
+  updateTag(getProjectsCacheTag(organization.id));
+  updateTag(getProjectCacheTag(organization.id, projectId));
 
   return {
     id: deletedProject.id,

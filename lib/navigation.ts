@@ -16,6 +16,7 @@ export type AppNavigationNode = {
   id: string;
   title: string;
   href?: string;
+  prefetch?: boolean;
   icon?: NavigationIcon;
   scope: NavigationScope;
   description: string;
@@ -82,6 +83,7 @@ export const appNavigation = [
     id: "projects",
     title: "Projects",
     href: "/projects",
+    prefetch: true,
     icon: "project",
     scope: "organization",
     requiresActiveOrganization: true,

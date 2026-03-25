@@ -32,10 +32,12 @@ function mapNavigationToSidebarItems(nodes: NavigationPreviewNode[]) {
   return nodes.map((node) => ({
     title: node.title,
     url: node.href ?? "",
+    prefetch: node.prefetch,
     icon: node.icon ? iconMap[node.icon] : undefined,
     items: node.children?.map((child) => ({
       title: child.title,
       url: child.href ?? "",
+      prefetch: child.prefetch,
     })),
   }));
 }
